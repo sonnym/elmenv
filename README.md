@@ -1,7 +1,7 @@
 # elmenv
 
 Simple management of Elm versions, inspired by projects like
-[elmenv](https://github.com/sstephenson/elmenv),
+[rbenv](https://github.com/sstephenson/rbenv),
 [nvm](https://github.com/creationix/nvm), and
 [phpenv](https://github.com/phpenv/phpenv).
 
