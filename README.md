@@ -33,7 +33,7 @@ operating system will do the following:
 * Run the shim named `elm`, which in turn passes the command along to
   elmenv
 
-### Choosing the Ruby Version
+### Choosing the Elm Version
 
 When you execute a shim, elmenv determines which Elm version to use by
 reading it from `.elm-version` file found by searching the directory of the
@@ -48,7 +48,7 @@ easy to fork and contribute any changes back upstream.
 1. Check out elmenv into `~/.elmenv`.
 
     ~~~ sh
-    $ git clone --recurse-submodules https://github.com/sonnym/elmenv.git ~/.env
+    $ git clone --recurse-submodules https://github.com/sonnym/elmenv.git ~/.elmenv
     ~~~
 
 2. Add `~/.elmenv/bin` to your `$PATH` for access to the `elmenv`
