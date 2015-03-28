@@ -88,3 +88,15 @@ $ cd ~/.elmenv
 $ git pull
 $ git submodule foreach $(git submodule update --init --recursive)
 ~~~
+
+## Installing Elm
+
+To install a Elm version for use with elmenv, run `elmenv install` with the
+exact name of the version you want to install. For example,
+
+    elmenv install 0.14.1
+
+Elm versions will be installed into a directory of the same name under
+`~/.elmenv/versions`. It is also possible install the `master` branch of
+elm. The installation is directly from source, so it is necessary to have
+an up to date haskell and cabal setup.
