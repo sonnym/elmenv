@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+# Summary: Configure the shell environment for elmenv
+# Usage: eval "$(elmenv init - [--no-rehash] [<shell>])"
+
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+print=""
+no_rehash=""
+for args in "$@"
+do
+  if [ "$args" = "-" ]; then
+    print=1
+    shift
+  fi
+
+  if [ "$args" = "--no-rehash" ]; then
+    no_rehash=1
+    shift
+  fi
+done
+
+shell="$1"
+if [ -z "$shell" ]; then
+  shell="$(ps c -p "$PPID" -o 'ucomm=' 2>/dev/null || true)"
+  shell="${shell##-}"
+  shell="${shell%% *}"
+  shell="$(basename "${shell:-$SHELL}")"
+fi
+
+root="${0%/*}/.."
+
+if [ -z "$print" ]; then
+  case "$shell" in
+  bash )
+    profile='~/.bash_profile'
+    ;;
+  zsh )
+    profile='~/.zshrc'
+    ;;
+  ksh )
+    profile='~/.profile'
+    ;;
+  fish )
+    profile='~/.config/fish/config.fish'
+    ;;
+  * )
+    profile='your profile'
+    ;;
+  esac
+
+  { echo "# Load elmenv automatically by adding"
+    echo "# the following to ${profile}:"
+    echo
+    case "$shell" in
+    fish )
+      echo 'status --is-interactive; and . (elmenv init -|psub)'
+      ;;
+    * )
+      echo 'eval "$(elmenv init -)"'
+      ;;
+    esac
+    echo
+  } >&2
+
+  exit 1
+fi
+
+mkdir -p "${ELMENV_ROOT}/"{shims,versions}
+
+case "$shell" in
+fish )
+  echo "setenv PATH '${ELMENV_ROOT}/shims' \$PATH"
+  echo "setenv ELMENV_SHELL $shell"
+;;
+* )
+  echo 'export PATH="'${ELMENV_ROOT}'/shims:${PATH}"'
+  echo "export ELMENV_SHELL=$shell"
+;;
+esac
+
+completion="${root}/completions/elmenv.${shell}"
+if [ -r "$completion" ]; then
+  case "$shell" in
+  fish ) echo ". '$completion'" ;;
+  *    ) echo "source '$completion'" ;;
+  esac
+fi
+
+if [ -z "$no_rehash" ]; then
+  echo 'elmenv rehash 2>/dev/null'
+fi
+
+commands=(`elmenv-commands --sh`)
+case "$shell" in
+fish )
+  cat <<EOS
+function elmenv
+  set command \$argv[1]
+  set -e argv[1]
+
+  switch "\$command"
+  case ${commands[*]}
+    eval (elmenv "sh-\$command" \$argv)
+  case '*'
+    command elmenv "\$command" \$argv
+  end
+end
+EOS
+  ;;
+ksh )
+  cat <<EOS
+function elmenv {
+  typeset command
+EOS
+  ;;
+* )
+  cat <<EOS
+elmenv() {
+  local command
+EOS
+  ;;
+esac
+
+if [ "$shell" != "fish" ]; then
+IFS="|"
+cat <<EOS
+  command="\$1"
+  if [ "\$#" -gt 0 ]; then
+    shift
+  fi
+
+  case "\$command" in
+  ${commands[*]})
+    eval "\`elmenv "sh-\$command" "\$@"\`";;
+  *)
+    command elmenv "\$command" "\$@";;
+  esac
+}
+EOS
+fi
