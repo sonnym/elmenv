@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+# Provide elmenv completions
+if [ "$1" = "--complete" ]; then
+  exec elmenv-rehash --complete
+fi
+
+shell="$(basename "${ELMENV_SHELL:-$SHELL}")"
+
+# When elmenv shell integration is enabled, delegate to elmenv-rehash,
+# then tell the shell to empty its command lookup cache.
+elmenv-rehash
+
+case "$shell" in
+fish )
+  # no rehash support
+  ;;
+* )
+  echo "hash -r 2>/dev/null || true"
+  ;;
+esac
