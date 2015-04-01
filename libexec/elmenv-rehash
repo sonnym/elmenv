@@ -82,7 +82,7 @@ remove_outdated_shims() {
 # List basenames of executables for every Elm version
 list_executable_names() {
   local file
-  for file in "$ELMENV_ROOT"/versions/*/bin/*; do
+  for file in "$ELMENV_ROOT"/elm-platform/installers/Elm-Platform/*/bin/*; do
     echo "${file##*/}"
   done
 }
