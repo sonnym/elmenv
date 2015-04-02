@@ -151,12 +151,13 @@ for script in "${scripts[@]}"; do source "$script"; done
 # compute the installation prefix.
 [ -n "$VERSION_NAME" ] || VERSION_NAME="${DEFINITION##*/}"
 PREFIX="${ELMENV_ROOT}/versions/${VERSION_NAME}"
+BIN_ROOT="${PREFIX}/bin"
 
 [ -d "${PREFIX}" ] && PREFIX_EXISTS=1
 
 # If the installation prefix exists, prompt for confirmation unless
 # the --force option was specified.
-if [ -d "${PREFIX}/bin" ]; then
+if [ -d "${BIN_ROOT}" ]; then
   if [ -z "$FORCE" ] && [ -z "$SKIP_EXISTING" ]; then
     echo "elmenv: $PREFIX already exists" >&2
     read -p "continue with installation? (y/N) "
@@ -202,11 +203,28 @@ cleanup() {
 
 trap cleanup SIGINT
 
+INSTALLERS_ROOT="$ELMENV_ROOT/elm-platform/installers"
+INSTALLERS_OUTPUT="$ELMENV_ROOT/elm-platform/installers/Elm-Platform/$VERSION_NAME/bin"
+
 # Invoke `elmenv` and record the exit status in $STATUS.
 STATUS=0
-echo "$VERSION"
-cd "$ELMENV_ROOT/elm-platform/installers" && runhaskell BuildFromSource.hs "$VERSION_NAME" || STATUS="$?"
+cd "$INSTALLERS_ROOT" && runhaskell BuildFromSource.hs "$VERSION_NAME" || STATUS="$?"
 cd "$ELMENV_ROOT"
+
+# Ensure `$BIN_ROOT` exists, and is empty
+mkdir -p "${BIN_ROOT}"
+rm -f "${BIN_ROOT}/*"
+
+# Make symbolic links to binaries
+if [ "$STATUS" == "0" ]; then
+  cd "$BIN_ROOT"
+
+  for file in "$INSTALLERS_OUTPUT"/*; do
+    ln --symbolic "$file"
+  done
+
+  cd "$ELMENV_ROOT"
+fi
 
 # Execute `after_install` hooks.
 for hook in "${after_hooks[@]}"; do eval "$hook"; done
