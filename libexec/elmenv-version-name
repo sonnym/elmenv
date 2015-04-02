@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Summary: Show the current Elm version
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+if [ -z "$ELMENV_VERSION" ]; then
+  ELMENV_VERSION_FILE="$(elmenv-version-file)"
+  ELMENV_VERSION="$(elmenv-version-file-read "$ELMENV_VERSION_FILE" || true)"
+fi
+
+if [ -z "$ELMENV_VERSION" ] || [ "$ELMENV_VERSION" = "system" ]; then
+  echo "system"
+  exit
+fi
+
+version_exists() {
+  local version="$1"
+  [ -d "${ELMENV_ROOT}/versions/${version}" ]
+}
+
+if version_exists "$ELMENV_VERSION"; then
+  echo "$ELMENV_VERSION"
+elif version_exists "${ELMENV_VERSION#ruby-}"; then
+  echo "${ELMENV_VERSION#ruby-}"
+else
+  echo "elmenv: version \`$ELMENV_VERSION' is not installed" >&2
+  exit 1
+fi

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Summary: Detect the file that sets the current elmenv version
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+find_local_version_file() {
+  local root="$1"
+  while [ -n "$root" ]; do
+    if [ -e "${root}/.elm-version" ]; then
+      echo "${root}/.elm-version"
+      exit
+    fi
+    root="${root%/*}"
+  done
+}
+
+find_local_version_file "$ELMENV_DIR"
+[ "$ELMENV_DIR" = "$PWD" ] || find_local_version_file "$PWD"
+
+global_version_file="${ELMENV_ROOT}/version"
+
+if [ -e "$global_version_file" ]; then
+  echo "$global_version_file"
+elif [ -e "${ELMENV_ROOT}/global" ]; then
+  echo "${ELMENV_ROOT}/global"
+elif [ -e "${ELMENV_ROOT}/default" ]; then
+  echo "${ELMENV_ROOT}/default"
+else
+  echo "$global_version_file"
+fi

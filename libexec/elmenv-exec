@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+#
+# Summary: Run an executable with the selected Elm version
+#
+# Usage: elmenv exec <command> [arg1 arg2...]
+#
+# Runs an executable by first preparing PATH so that the selected Elm
+# version's `bin' directory is at the front.
+#
+# For example, if the currently selected Elm version is 1.14.1:
+#   elmenv exec elm-reactor
+#
+# is equivalent to:
+#   PATH="$ELMENV_ROOT/versions/1.14.1/bin:$PATH" elm-reactor
+
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+# Provide elmenv completions
+if [ "$1" = "--complete" ]; then
+  exec elmenv-shims --short
+fi
+
+ELMENV_VERSION="$(elmenv-version-name)"
+ELMENV_COMMAND="$1"
+
+if [ -z "$ELMENV_COMMAND" ]; then
+  elmenv-help --usage exec >&2
+  exit 1
+fi
+
+export ELMENV_VERSION
+ELMENV_COMMAND_PATH="$(elmenv-which "$ELMENV_COMMAND")"
+ELMENV_BIN_PATH="${ELMENV_COMMAND_PATH%/*}"
+
+OLDIFS="$IFS"
+IFS=$'\n' scripts=(`elmenv-hooks exec`)
+IFS="$OLDIFS"
+for script in "${scripts[@]}"; do
+  source "$script"
+done
+
+shift 1
+if [ "$ELMENV_VERSION" != "system" ]; then
+  export PATH="${ELMENV_BIN_PATH}:${PATH}"
+fi
+exec -a "$ELMENV_COMMAND" "$ELMENV_COMMAND_PATH" "$@"

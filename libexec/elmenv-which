@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+#
+# Summary: Display the full path to an executable
+#
+# Usage: elmenv which <command>
+#
+# Displays the full path to the executable that elmenv will invoke when
+# you run the given command.
+
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+# Provide elmenv completions
+if [ "$1" = "--complete" ]; then
+  exec elmenv-shims --short
+fi
+
+remove_from_path() {
+  local path_to_remove="$1"
+  local path_before
+  local result=":$PATH:"
+  while [ "$path_before" != "$result" ]; do
+    path_before="$result"
+    result="${result//:$path_to_remove:/:}"
+  done
+  echo "${result%:}"
+}
+
+ELMENV_COMMAND="$1"
+
+if [ -z "$ELMENV_COMMAND" ]; then
+  elmenv-help --usage which >&2
+  exit 1
+fi
+
+ELMENV_VERSION="${ELMENV_VERSION:-$(elmenv-version-name)}"
+
+if [ "$ELMENV_VERSION" = "system" ]; then
+  PATH="$(remove_from_path "${ELMENV_ROOT}/shims")"
+  ELMENV_COMMAND_PATH="$(command -v "$ELMENV_COMMAND" || true)"
+else
+  ELMENV_COMMAND_PATH="${ELMENV_ROOT}/versions/${ELMENV_VERSION}/bin/${ELMENV_COMMAND}"
+fi
+
+OLDIFS="$IFS"
+IFS=$'\n' scripts=(`elmenv-hooks which`)
+IFS="$OLDIFS"
+for script in "${scripts[@]}"; do
+  source "$script"
+done
+
+if [ -x "$ELMENV_COMMAND_PATH" ]; then
+  echo "$ELMENV_COMMAND_PATH"
+elif ! [ -d "${ELMENV_ROOT}/versions/${ELMENV_VERSION}" ]; then
+  echo "elmenv: version \`$ELMENV_VERSION' is not installed" >&2
+  exit 1
+else
+  echo "elmenv: $ELMENV_COMMAND: command not found" >&2
+
+  versions="$(elmenv-whence "$ELMENV_COMMAND" || true)"
+  if [ -n "$versions" ]; then
+    { echo
+      echo "The \`$1' command exists in these Elm versions:"
+      echo "$versions" | sed 's/^/  /g'
+      echo
+    } >&2
+  fi
+
+  exit 127
+fi
