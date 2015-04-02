@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+#
+# Summary: Set or show the local application-specific Elm version
+#
+# Usage: elmenv local <version>
+#        elmenv local --unset
+#
+# Sets the local application-specific Elm version by writing the
+# version name to a file named `.elm-version'.
+#
+# When you run a Elm command, elmenv will look for a `.elm-version'
+# file in the current directory and each parent directory. If no such
+# file is found in the tree, elmenv will use the global Elm version
+# specified with `elmenv global'. A version specified with the
+# `ELMENV_VERSION' environment variable takes precedence over local
+# and global versions.
+#
+# For backwards compatibility, elmenv will also read version
+# specifications from `.elmv-version' files, but a `.elm-version'
+# file in the same directory takes precedence.
+#
+# <version> should be a string matching a Elm version known to elmenv.
+# The special version string `system' will use your default system Elm.
+# Run `elmenv versions' for a list of available Elm versions.
+
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+# Provide elmenv completions
+if [ "$1" = "--complete" ]; then
+  echo --unset
+  echo system
+  exec elmenv-versions --bare
+fi
+
+ELMENV_VERSION="$1"
+
+if [ "$ELMENV_VERSION" = "--unset" ]; then
+  rm -f .elm-version
+elif [ -n "$ELMENV_VERSION" ]; then
+  previous_file="$(ELMENV_VERSION= elmenv-version-origin || true)"
+  elmenv-version-file-write .elm-version "$ELMENV_VERSION"
+else
+  elmenv-version-file-read .elm-version ||
+  { echo "elmenv: no local version configured for this directory"
+    exit 1
+  } >&2
+fi
