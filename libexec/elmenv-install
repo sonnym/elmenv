@@ -28,12 +28,6 @@ if [ -z "$ELMENV_ROOT" ]; then
   ELMENV_ROOT="${HOME}/.elmenv"
 fi
 
-# Add `share/versions/` directory to the list of paths where build definitions are looked up.
-shopt -s nullglob
-for plugin_path in "$ELMENV_ROOT"/share/versions; do
-  ELM_BUILD_DEFINITIONS="${ELM_BUILD_DEFINITIONS}:${plugin_path}"
-done
-export ELM_BUILD_DEFINITIONS
 shopt -u nullglob
 
 parse_options() {
