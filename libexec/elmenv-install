@@ -167,7 +167,7 @@ if [ -d "${BIN_ROOT}" ]; then
     * ) exit 1 ;;
     esac
   elif [ -n "$SKIP_EXISTING" ]; then
-    # Since we know the ruby version is already installed, and are opting to
+    # Since we know the elm version is already installed, and are opting to
     # not force installation of existing versions, we just `exit 0` here to
     # leave things happy
     exit 0
@@ -188,7 +188,7 @@ fi
 
 # Default ELMENV_VERSION to the globally-specified Elm version. (The
 # REE installer requires an existing Elm installation to run. An
-# unsatisfied local .ruby-version file can cause the installer to
+# unsatisfied local .elm-version file can cause the installer to
 # fail.)
 export ELMENV_VERSION="$(elmenv-global 2>/dev/null || true)"
 

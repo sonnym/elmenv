@@ -3,7 +3,7 @@
 # Usage: elmenv commands [--sh|--no-sh]
 
 set -e
-[ -n "$RBENV_DEBUG" ] && set -x
+[ -n "$ELMENV_DEBUG" ] && set -x
 
 # Provide elmenv completions
 if [ "$1" = "--complete" ]; then

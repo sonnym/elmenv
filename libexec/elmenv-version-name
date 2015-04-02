@@ -20,8 +20,8 @@ version_exists() {
 
 if version_exists "$ELMENV_VERSION"; then
   echo "$ELMENV_VERSION"
-elif version_exists "${ELMENV_VERSION#ruby-}"; then
-  echo "${ELMENV_VERSION#ruby-}"
+elif version_exists "${ELMENV_VERSION#elm-}"; then
+  echo "${ELMENV_VERSION#elm-}"
 else
   echo "elmenv: version \`$ELMENV_VERSION' is not installed" >&2
   exit 1

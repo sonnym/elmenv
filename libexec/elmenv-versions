@@ -31,7 +31,7 @@ print_version() {
 }
 
 # Include "system" in the non-bare output, if it exists
-if [ -n "$include_system" ] && ELMENV_VERSION=system elmenv-which ruby >/dev/null 2>&1; then
+if [ -n "$include_system" ] && ELMENV_VERSION=system elmenv-which elm >/dev/null 2>&1; then
   print_version system
 fi
 
