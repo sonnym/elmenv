@@ -205,8 +205,8 @@ trap cleanup SIGINT
 # Invoke `elmenv` and record the exit status in $STATUS.
 STATUS=0
 echo "$VERSION"
-cd elm-platform/installers && runhaskell BuildFromSource.hs "$VERSION_NAME" || STATUS="$?"
-cd -
+cd "$ELMENV_ROOT/elm-platform/installers" && runhaskell BuildFromSource.hs "$VERSION_NAME" || STATUS="$?"
+cd "$ELMENV_ROOT"
 
 # Execute `after_install` hooks.
 for hook in "${after_hooks[@]}"; do eval "$hook"; done
