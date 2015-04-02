@@ -35,10 +35,27 @@ operating system will do the following:
 
 ### Choosing the Elm Version
 
-When you execute a shim, elmenv determines which Elm version to use by
-reading it from `.elm-version` file found by searching the directory of the
-script you are executing and each of its parent directories until reaching
-the root of your filesystem.
+When you execute a shim, elmenv determines which Ruby version to use by
+reading it from the following sources, in this order:
+
+1. The `ELMENV_VERSION` environment variable, if specified. You can use
+   the [`elmenv shell`](#elmenv-shell) command to set this environment
+   variable in your current shell session.
+
+2. The first `.elm-version` file found by searching the directory of the
+   script you are executing and each of its parent directories until reaching
+   the root of your filesystem.
+
+3. The first `.elm-version` file found by searching the current working
+   directory and each of its parent directories until reaching the root of your
+   filesystem. You can modify the `.elm-version` file in the current working
+   directory with the [`elmenv local`](#elmenv-local) command.
+
+4. The global `~/.elmenv/version` file. You can modify this file using
+   the [`elmenv global`](#elmenv-global) command. If the global version
+   file is not present, elmenv assumes you want to use the "system"
+   Ruby—i.e. whatever version would be run if elmenv weren't in your
+   path.
 
 ## Installation
 
