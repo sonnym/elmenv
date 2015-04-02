@@ -205,16 +205,15 @@ STATUS=0
 cd "$INSTALLERS_ROOT" && runhaskell BuildFromSource.hs "$VERSION_NAME" || STATUS="$?"
 cd "$ELMENV_ROOT"
 
-# Ensure `$BIN_ROOT` exists, and is empty
-mkdir -p "${BIN_ROOT}"
-rm -f "${BIN_ROOT}/*"
+# Ensure `$BIN_ROOT` exists
+mkdir -p "$BIN_ROOT"
 
 # Make symbolic links to binaries
 if [ "$STATUS" == "0" ]; then
   cd "$BIN_ROOT"
 
   for file in "$INSTALLERS_OUTPUT"/*; do
-    ln --symbolic "$file"
+    ln --symbolic --force "$file"
   done
 
   cd "$ELMENV_ROOT"
