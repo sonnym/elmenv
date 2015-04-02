@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Summary: Display prefix for a Elm version
+# Usage: elmenv prefix [<version>]
+#
+# Displays the directory where a Elm version is installed. If no
+# version is given, `elmenv prefix' displays the location of the
+# currently selected version.
+
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+# Provide elmenv completions
+if [ "$1" = "--complete" ]; then
+  echo system
+  exec elmenv-versions --bare
+fi
+
+if [ -n "$1" ]; then
+  export ELMENV_VERSION="$1"
+elif [ -z "$ELMENV_VERSION" ]; then
+  ELMENV_VERSION="$(elmenv-version-name)"
+fi
+
+if [ "$ELMENV_VERSION" = "system" ]; then
+  if ELM_PATH="$(elmenv-which elm 2>/dev/null)"; then
+    ELM_PATH="${ELM_PATH%/*}"
+    echo "${ELM_PATH%/bin}"
+    exit
+  else
+    echo "elmenv: system version not found in PATH" >&2
+    exit 1
+  fi
+fi
+
+ELMENV_PREFIX_PATH="${ELMENV_ROOT}/versions/${ELMENV_VERSION}"
+if [ ! -d "$ELMENV_PREFIX_PATH" ]; then
+  echo "elmenv: version \`${ELMENV_VERSION}' not installed" >&2
+  exit 1
+fi
+
+echo "$ELMENV_PREFIX_PATH"

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Usage: elmenv version-file-write <file> <version>
+
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+ELMENV_VERSION_FILE="$1"
+ELMENV_VERSION="$2"
+
+if [ -z "$ELMENV_VERSION" ] || [ -z "$ELMENV_VERSION_FILE" ]; then
+  elmenv-help --usage version-file-write >&2
+  exit 1
+fi
+
+# Make sure the specified version is installed.
+elmenv-prefix "$ELMENV_VERSION" >/dev/null
+
+# Write the version out to disk.
+echo "$ELMENV_VERSION" > "$ELMENV_VERSION_FILE"

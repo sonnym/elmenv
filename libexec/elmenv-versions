@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Summary: List all Elm versions available to elmenv
+# Usage: elmenv versions [--bare]
+#
+# Lists all Elm versions found in `$ELMENV_ROOT/versions/*'.
+
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+if [ "$1" = "--bare" ]; then
+  hit_prefix=""
+  miss_prefix=""
+  current_version=""
+  include_system=""
+else
+  hit_prefix="* "
+  miss_prefix="  "
+  current_version="$(elmenv-version-name || true)"
+  include_system="1"
+fi
+
+num_versions=0
+
+print_version() {
+  if [ "$1" == "$current_version" ]; then
+    echo "${hit_prefix}$(elmenv-version 2>/dev/null)"
+  else
+    echo "${miss_prefix}$1"
+  fi
+  num_versions=$((num_versions + 1))
+}
+
+# Include "system" in the non-bare output, if it exists
+if [ -n "$include_system" ] && ELMENV_VERSION=system elmenv-which ruby >/dev/null 2>&1; then
+  print_version system
+fi
+
+shopt -s nullglob
+for path in "${ELMENV_ROOT}/versions/"*; do
+  if [ -d "$path" ]; then
+    print_version "${path##*/}"
+  fi
+done
+shopt -u nullglob
+
+if [ "$num_versions" -eq 0 ] && [ -n "$include_system" ]; then
+  echo "Warning: no Elm detected on the system" >&2
+  exit 1
+fi

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#
+# Summary: Set or show the global Elm version
+#
+# Usage: elmenv global <version>
+#
+# Sets the global Elm version. You can override the global version at
+# any time by setting a directory-specific version with `elmenv local'
+# or by setting the `ELMENV_VERSION' environment variable.
+#
+# <version> should be a string matching a Elm version known to elmenv.
+# The special version string `system' will use your default system Elm.
+# Run `elmenv versions' for a list of available Elm versions.
+
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+# Provide elmenv completions
+if [ "$1" = "--complete" ]; then
+  echo system
+  exec elmenv-versions --bare
+fi
+
+ELMENV_VERSION="$1"
+ELMENV_VERSION_FILE="${ELMENV_ROOT}/version"
+
+if [ -n "$ELMENV_VERSION" ]; then
+  elmenv-version-file-write "$ELMENV_VERSION_FILE" "$ELMENV_VERSION"
+else
+  elmenv-version-file-read "$ELMENV_VERSION_FILE" ||
+  elmenv-version-file-read "${ELMENV_ROOT}/global" ||
+  elmenv-version-file-read "${ELMENV_ROOT}/default" ||
+  echo system
+fi
