@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Summary: Explain how the current Elm version is set
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+if [ -n "$ELMENV_VERSION" ]; then
+  echo "ELMENV_VERSION environment variable"
+else
+  elmenv-version-file
+fi
