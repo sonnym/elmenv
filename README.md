@@ -35,7 +35,7 @@ operating system will do the following:
 
 ### Choosing the Elm Version
 
-When you execute a shim, elmenv determines which Ruby version to use by
+When you execute a shim, elmenv determines which Elm version to use by
 reading it from the following sources, in this order:
 
 1. The `ELMENV_VERSION` environment variable, if specified. You can use
@@ -54,7 +54,7 @@ reading it from the following sources, in this order:
 4. The global `~/.elmenv/version` file. You can modify this file using
    the [`elmenv global`](#elmenv-global) command. If the global version
    file is not present, elmenv assumes you want to use the "system"
-   Ruby—i.e. whatever version would be run if elmenv weren't in your
+   Elm—i.e. whatever version would be run if elmenv weren't in your
    path.
 
 ## Installation
