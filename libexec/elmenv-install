@@ -213,7 +213,7 @@ if [ "$STATUS" == "0" ]; then
   cd "$BIN_ROOT"
 
   for file in "$INSTALLERS_OUTPUT"/*; do
-    ln --symbolic --force "$file"
+    ln -sf "$file"
   done
 
   cd "$ELMENV_ROOT"
