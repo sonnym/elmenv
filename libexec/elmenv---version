@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Summary: Display the version of elmenv
+#
+# Displays the current revision from git, if available.
+
+set -e
+[ -n "$ELMENV_DEBUG" ] && set -x
+
+if cd "$ELMENV_ROOT" 2>/dev/null; then
+  git_revision="$(git rev-parse HEAD 2>/dev/null || true)"
+fi
+
+echo "elmenv ${git_revision}"
