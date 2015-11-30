@@ -198,7 +198,7 @@ cleanup() {
 trap cleanup SIGINT
 
 INSTALLERS_ROOT="$ELMENV_ROOT/elm-platform/installers"
-INSTALLERS_OUTPUT="$ELMENV_ROOT/elm-platform/installers/Elm-Platform/$VERSION_NAME/bin"
+INSTALLERS_OUTPUT="$ELMENV_ROOT/elm-platform/installers/Elm-Platform/$VERSION_NAME/.cabal-sandbox/bin"
 
 # Invoke `elmenv` and record the exit status in $STATUS.
 STATUS=0
