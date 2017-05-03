@@ -28,6 +28,8 @@ if [ -z "$ELMENV_ROOT" ]; then
   ELMENV_ROOT="${HOME}/.elmenv"
 fi
 
+INSTALLERS_ROOT="$ELMENV_ROOT/elm-platform/installers"
+
 shopt -u nullglob
 
 parse_options() {
@@ -60,7 +62,7 @@ usage() {
 
 definitions() {
   local query="$1"
-  elmenv --definitions | $(type -p ggrep grep | head -1) -F "$query" || true
+  cd "$INSTALLERS_ROOT" && runhaskell BuildFromSource.hs 2>&1 | tail -n 1 | awk 'BEGIN { RS="," } { print $1 }'
 }
 
 indent() {
@@ -197,7 +199,6 @@ cleanup() {
 
 trap cleanup SIGINT
 
-INSTALLERS_ROOT="$ELMENV_ROOT/elm-platform/installers"
 INSTALLERS_OUTPUT="$ELMENV_ROOT/elm-platform/installers/Elm-Platform/$VERSION_NAME/.cabal-sandbox/bin"
 
 # Invoke `elmenv` and record the exit status in $STATUS.
